@@ -1,0 +1,80 @@
+.common{
+    text-align: center;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.header{
+    background-color: black;
+    color: white;
+    height: 100px;
+    line-height: 100px;
+}
+
+.mainbody{
+    background-color: #FFFFFF;
+}
+.footer{
+    position: fixed;
+    background-color: black;
+    color: white;
+    bottom: 0px;
+    left: 5px;
+    right: 5px;
+    height: 25px;
+    line-height: 25px;
+}
+
+h2 {
+    color: grey;
+  }
+  
+  .back-to-top {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    margin: 2rem auto;
+    background-color: #000;       /* black background */
+    color: #fff;                  /* white text */
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .back-to-top:hover {
+    background-color: #333;       /* slightly lighter black on hover */
+    transform: translateY(-2px);  /* subtle lift effect */
+  }
+  
+  
+.centered-text {
+    text-align: left;
+  }
+  
+
+img{
+    display: block;
+    width: 25%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+nav{
+    background-color: lightgray;
+    padding: 10px;
+    overflow: hidden;
+}
+    
+nav a{ 
+    color: #333;
+    text-decoration: none;
+    padding: 20px;
+    font-weight: bold;
+}
+
+nav a:hover{
+    background-color: #ccc;
+}
+

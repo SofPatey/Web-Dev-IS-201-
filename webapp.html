@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Baby Name Generator</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fef6fb;
+      color: #4b5563;
+      margin: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #6b21a8;
+    }
+
+    label, input, select, button {
+      display: block;
+      margin: 10px 0;
+      width: 100%;
+    }
+
+    input[type="text"], select {
+      padding: 0.4rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background: #fff0f6;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      gap: 1rem;
+      margin: 10px 0;
+      justify-content: center;
+    }
+
+    .toggle-buttons button {
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      border: none;
+      background-color: #f3e8ff;
+      color: #6b21a8;
+      cursor: pointer;
+    }
+
+    .toggle-buttons button.active {
+      background-color: #d8b4fe;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      background-color: #d8b4fe;
+      color: #4b0082;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c084fc;
+    }
+
+    .results, .saved {
+      margin-top: 2rem;
+    }
+
+    .name-option {
+      margin: 8px 0;
+      padding: 10px;
+      background: #f7f3ff;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .name-option label {
+      font-size: 1.1rem;
+    }
+
+    .saved h3 {
+      color: #7c3aed;
+    }
+
+    .last-name {
+      color: #9b4d96;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+    }
+
+    .input-container input {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  
+  <h1>Baby Name Generator</h1>
+
+
+<a href="index.html" class="back-button">⬅ Back to Home</a>
+
+
+  <p style="text-align:center; color:#7c3aed; font-style:italic;">Note: This generator uses a limited pool of names for now. More coming soon!</p>
+
+  <label for="letter">Enter starting letter for first name (optional, use CAPS):</label>
+  <input type="text" id="letter" maxlength="1" value="A">
+
+  <label for="gender">Select gender:</label>
+  <select id="gender">
+    <option value="girl">Girl</option>
+    <option value="boy">Boy</option>
+  </select>
+
+  <label>Include middle name?</label>
+  <div class="toggle-buttons">
+    <button id="yesBtn" onclick="toggleMiddleName(true)">Yes</button>
+    <button id="noBtn" onclick="toggleMiddleName(false)">No</button>
+  </div>
+
+  <div id="middleLetterContainer" style="display:none;">
+    <label for="middleLetter">Enter starting letter for middle name (optional, use CAPS):</label>
+    <input type="text" id="middleLetter" maxlength="1" value="J">
+  </div>
+
+  <label for="lastName">Enter your last name (optional):</label>
+  <input type="text" id="lastName" placeholder="Enter last name">
+
+  <button onclick="generateNames()">Generate Names</button>
+
+  <div class="results">
+    <h3>Generated Names:</h3>
+  </div>
+
+  <div class="saved">
+    <h3>Saved Names:</h3>
+    <div id="savedNamesContainer"></div>
+  </div>
+
+  <script>
+    function goBack() {
+  history.back();
+}
+
+    let savedNames = [];
+
+    window.onload = function () {
+      const saved = JSON.parse(localStorage.getItem('savedNames') || '[]');
+      savedNames = saved;
+      updateSavedNames();
+    };
+
+    document.addEventListener('click', function (e) {
+      if (e.target.classList.contains('saveCheckbox')) {
+        const nameLabel = e.target.closest('.name-option')?.querySelector('label');
+        if (!nameLabel) return;
+        const name = nameLabel.innerText;
+        if (e.target.checked && !savedNames.includes(name)) {
+          savedNames.push(name);
+        } else if (!e.target.checked) {
+          savedNames = savedNames.filter(n => n !== name);
+        }
+        updateSavedNames();
+      }
+
+      if (e.target.classList.contains('delete-btn')) {
+        const label = e.target.closest('.name-option')?.querySelector('.editable-name');
+        if (!label) return;
+        const name = label.value;
+        savedNames = savedNames.filter(n => n !== name);
+        updateSavedNames();
+      }
+    });
+
+    function updateSavedNames() {
+      const container = document.getElementById('savedNamesContainer');
+      container.innerHTML = '';
+      localStorage.setItem('savedNames', JSON.stringify(savedNames));
+      savedNames.forEach(name => {
+        const item = document.createElement('div');
+        item.classList.add('name-option');
+        item.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+            <input class="editable-name" value="${name}" style="flex: 1; font-size: 1.1rem; padding: 6px; border: 1px solid #ccc; border-radius: 4px; background: #fffafc;">
+            <div class="edit-actions" style="display: flex; gap: 10px;">
+              <button class="delete-btn" style="background: none; border: none; color: #6b21a8; cursor: pointer; font-size: 1rem;">🗑️</button>
+            </div>
+          </div>`;
+        container.appendChild(item);
+      });
+    }
+
+    function toggleMiddleName(include) {
+      document.getElementById('yesBtn').classList.toggle('active', include);
+      document.getElementById('noBtn').classList.toggle('active', !include);
+      document.getElementById('middleLetterContainer').style.display = include ? 'block' : 'none';
+    }
+
+    function generateNames() {
+      const firstLetter = document.getElementById('letter').value.toLowerCase();
+      const gender = document.getElementById('gender').value;
+      const includeMiddleName = document.getElementById('yesBtn').classList.contains('active');
+      const middleLetter = includeMiddleName ? document.getElementById('middleLetter').value.toLowerCase() : "";
+      const lastName = document.getElementById('lastName').value;
+
+      const namePool = {
+        girl: [
+          'Abigail', 'Ada', 'Adeline', 'Alice', 'Anna', 'Avery', 'Charlotte', 'Clara', 'Daisy', 'Eleanor',
+          'Eliza', 'Ella', 'Emma', 'Evelyn', 'Faith', 'Felicity', 'Grace', 'Gredtle', 'Hadley', 'Hannah', 'Hazel', 'Hope',
+          'Isabel', 'Isla', 'Ivy', 'Jane', 'Josephine', 'Joy', 'June', 'Layla', 'Leah', 'Lily',
+          'Lucy', 'Luna', 'Mabel', 'Maggie', 'Maisie', 'Margot', 'Mary', 'Mia', 'Mabel', 'Naomi', 'Nora', 'Naomi',
+          'Olivia','Olive', 'Pearl', 'Phoebe', 'Posie', 'Rachel', 'Rachell', 'Rosie', 'Ruby', 'Ruth', 'Sadie', 'Samantha', 'Sarah',
+          'Savannah', 'Sophie', 'Stella', 'Tabitha', 'Talitha', 'Vera', 'Violet', 'Vivian', 'Willa', 'Willow', 'Zoe', 'Elsa', 
+          'Sydney', 'Sofia'
+        ],
+        boy: [
+          'Abel', 'Adam', 'Alexander', 'Andrew', 'Asher', 'Benjamin', 'Ben', 'Caleb', 'Charles', 'Christopher', 'Daniel',
+          'David','Denver', 'Eli', 'Elijah', 'Emmett', 'Ethan', 'Ezra', 'Felix', 'Finn','Finnley', 'Gabe', 'Gregory', 'Gabriel', 'Gideon',
+          'Henry','Hendrickson','Harrison', 'Hudson', 'Isaac', 'Isaiah','Jared', 'Jack', 'Jacob', 'James', 'Jesse', 'John', 'Jonah', 'Joseph',
+          'Joshua', 'Judah', 'Julian', 'Levi', 'Liam', 'Lucas', 'Luke', 'Malachi', 'Miles', 'Matthew', 'Micah',
+          'Nathan','Nathaniel', 'Noah', 'Oliver', 'Owen', 'Peter','Parker', 'Samuel', 'Silas', 'Simon', 'Theodore', 'Thomas',
+          'Tobias', 'Victor', 'Vic', 'William', 'Willhelm', 'Zachary', 'Zion'
+        ]
+      };
+
+      const isDefault = !firstLetter && !includeMiddleName && !lastName;
+      const count = isDefault ? 10 : 2;
+      const generatedNames = [];
+
+      for (let i = 0; i < count; i++) {
+        const firstResult = getUniqueName(namePool[gender], firstLetter);
+        if (!firstResult.name) continue;
+        const firstName = firstResult.name;
+
+        const middleResult = includeMiddleName ? getUniqueName(namePool[gender], middleLetter) : { name: '', hasMatch: true };
+        const middleName = middleResult.name;
+
+        if (!middleResult.hasMatch && includeMiddleName) continue;
+
+        const fullName = firstName + (middleName ? ' ' + middleName : '') + (lastName ? ' ' + lastName : '');
+        generatedNames.push(fullName);
+      }
+
+      displayNames(generatedNames);
+    }
+
+    function getUniqueName(pool, letter) {
+      const filtered = letter
+        ? pool.filter(name => name.toLowerCase().startsWith(letter))
+        : [...pool];
+
+      return {
+        name: filtered.length > 0 ? filtered.splice(Math.floor(Math.random() * filtered.length), 1)[0] : null,
+        hasMatch: filtered.length > 0
+      };
+    }
+
+    function displayNames(names) {
+      const resultsContainer = document.querySelector('.results');
+      resultsContainer.innerHTML = "<h3>Generated Names:</h3>";
+
+      if (names.length === 0) {
+        resultsContainer.innerHTML += `<p style='color: #b91c1c;'>No names found with the selected starting letter(s).</p>`;
+        return;
+      }
+
+      names.forEach(name => {
+        const nameElement = document.createElement('div');
+        nameElement.classList.add('name-option');
+        nameElement.innerHTML = `<div style='display: flex; align-items: center; justify-content: space-between;'><label>${name}</label><input type="checkbox" class="saveCheckbox"></div>`;
+        resultsContainer.appendChild(nameElement);
+      });
+    }
+  </script>
+</body>
+</html>
